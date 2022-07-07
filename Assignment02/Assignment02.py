@@ -22,7 +22,7 @@ type(d)
 type(V)
 
 #Question Number 3
-A = [2,2.0,10j,"2 Cool for School",True]
+A = [2,2.0,10j,"2 Cool for School",True] # Looking for list created from defined variables so A = [I, i, D, d, V]
 
 #Question Number 4
 B = "I like pie more than cake."
@@ -46,8 +46,8 @@ def Foobar_function (multiple: int) ->int:
     >>> 15
     foobar
     """
-    
-    if (multiple % 15 == 0 and multiple % 5 == 0 and multiple % 3 == 0):
+    # slight example issue, you should declare the function in example so >>> Foobar_function(9) (-2)
+    if (multiple % 15 == 0): # and multiple % 5 == 0 and multiple % 3 == 0): # this part is redundant since it is only the case when 5 and 3 are both mod 0, that mean mod 15 is zero (-1)
        return print("foobar")
     elif (multiple % 15 == 0):
         return print("foobar")
@@ -59,5 +59,7 @@ def Foobar_function (multiple: int) ->int:
         return print("Not a multiple of 3,5, or 15")
 
 Foobar_function(10)
-
-
+Foobar_function("cat")
+Foobar_function(90)
+Foobar_function(27)
+# Should test all cases including issues such as unexpected inputs (-5)
