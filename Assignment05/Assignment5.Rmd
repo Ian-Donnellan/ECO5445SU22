@@ -1,0 +1,75 @@
+---
+title: "Assignment05"
+output: html_document
+date: '2022-07-14'
+---
+Question #2
+
+```{r}
+Two <- 2
+Two_oh <- 2.0
+Three <- "10j"
+Four <- "2 Cool for School"
+Five <- TRUE
+
+str(Two)
+str(Two_oh)
+str(Three)
+str(Four)
+str(Five)
+
+```
+
+```{r}
+Foobar_Function <- function(x) {
+  if (x %% 15 == 0) return(print("foobar"))
+  else if (x %% 5 == 0) return(print("bar"))
+  else if (x %% 3 == 0) return(print("foo"))
+  else if (x > 0) return(print("not a multiple of 3, 5, or 15"))
+}
+
+Foobar_Function()
+```
+
+Question 3 and 4
+```{r}
+attach(swiss)
+
+summary(swiss)
+```
+
+Question 5
+```{r}
+
+max(swiss[,2])
+row.names(swiss[33,])
+
+```
+
+Question 6
+```{r}
+
+cor(swiss)
+
+```
+
+Question 7
+```{r}
+
+plot(Education, Fertility, main = "Correlation Between Fertility and Education")
+text(Education, Fertility, row.names(swiss), pos = 3, cex = .6, col = "blue")
+
+```
+
+Question 8
+```{r}
+hist(Catholic, breaks = 20, labels = TRUE, ylim = range(0,12))
+
+detach(swiss)
+```
+
+
+
+
+
+
