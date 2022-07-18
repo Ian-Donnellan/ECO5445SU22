@@ -5,7 +5,7 @@ Created on Sun Jul 10 13:12:03 2022
 @author: Ian Ah
 """
 
-import os
+import os # not needed for this assignment (-5)
 
 import numpy as np
 

@@ -5,7 +5,7 @@ Created on Thu Jul  7 11:07:32 2022
 @author: Ian Ah
 """
 
-import os
+import os # not used in this file
 
 import numpy as np
 
@@ -28,9 +28,9 @@ np.sum(B, axis=1)
 
 np.sum(B, axis=0)
 
-np.cumsum(B, axis=1)
+np.cumsum(B, axis=1) # Looking for a single value, so sum of them. This operation transforms current values to their cummulative sum per element (-2)
 
-np.cumsum(B, axis=0)
+np.cumsum(B, axis=0) # Looking for a single value, so sum of them. This operation transforms current values to their cummulative sum per element (-2)
 #Question 5
 log_array = np.log(B)
 
@@ -49,6 +49,6 @@ X_inv = np.linalg.inv(X)
 X.dot(X_inv)
 
 X_sol = X_inv.dot(Y)
-print(X_sol)
+print(X_sol) # Which one is quantity and which one is price? (-4)
 #To Confirm Solution 
 X.dot(X_sol)
