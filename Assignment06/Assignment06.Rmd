@@ -1,0 +1,128 @@
+---
+title: "Assignment 6"
+author: "Your Name Here"
+date: '2022-07-24'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages}
+# Add any packages you want in this chunk:
+library(car)
+library(gvlma)
+```
+
+We are going to look at the property prices for Orange County. From there we are going to try and predict the sales price by linear regression.
+
+# Importing Data 
+
+Bring in the data and make sure the data types are correct. If not, make the proper changes. The file is located within this project. *data/prop_prices_reduced.csv*
+
+```{r}
+housing <- read.csv("C:/Users/Ian Ah/Documents/GitHub/ECO5445/Assignment06/data/prop_prices_reduced.csv")
+housing$pool <- factor(housing$pool) 
+```
+
+
+# Plotting
+
+Plot histograms for all variables. Additionally, add scatterplots for the relationships between all quantitative variables.
+
+```{r}
+hist(housing$sale_def)
+hist(housing$bed)
+hist(housing$bath)
+hist(housing$area_heated)
+hist(housing$area)
+hist(housing$dist_cbd)
+hist(housing$dist_lakes)
+hist(housing$pool)
+
+plot(housing$sale_def, housing$area_heated)
+plot(housing$sale_def, housing$bed)
+plot(housing$sale_def, housing$bath)
+plot(housing$sale_def, housing$area)
+plot(housing$sale_def, housing$dist_cbd)
+plot(housing$sale_def, housing$dist_lakes)
+plot(housing$sale_def, housing$pool)
+
+scatterplotMatrix(housing, spread = FALSE, lty.smooth = 2,
+    main = "Scatterplot Matrix")
+```
+
+# Summary Statistics
+
+Provide basic summary statistics for univariate analysis. Also, provide the correlation between all the quantitative variables.
+
+```{r}
+summary(housing)
+cor(housing)
+```
+
+# Regression Analysis
+
+Run a regression with all the variables included. Print results of the regression.
+
+```{r}
+Reg <- lm(sale_def ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
+summary(Reg)
+plot(Reg)
+durbinWatsonTest(Reg)
+gvmodel <- gvlma(Test_1)
+summary(gvmodel)
+vif(Reg)
+outlierTest(Reg)
+```
+
+Which of the variables tested significant at the 95% level? Looking at the results and answering outside of the chunk is sufficient.
+
+Values that tested significant at the 95% level were sale_def, bed, bath, area_heated, area, dist_cbd, and pool. 
+
+## Evaluating the model
+
+As is, are any of the Gauss-Markov assumptions violated? If so, which ones? How can you fix the issues?
+
+```{r}
+#Assumption one is violated as many of the relationships between the variables are non-linear. For example, the relationship between sale_def and pools does not represent a linear relationship as the points plotted are 2 separate lines. 
+```
+
+## New Model
+
+Based off of your findings in the previous section, make changes to the variables, the functional form, etc.
+
+```{r}
+housing$log_price <- (housing$sale_def/housing$area)
+housing$log_lake <- (housing$dist_lakes^2)
+housing$log_bath <- log(housing$bath)
+
+Reg <- lm(log_price ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
+summary(Reg)
+Test_1 <- lm(sale_def ~ area_heated + bath + area + bed + dist_cbd + dist_lakes, data = housing)
+summary(Test_1)
+plot(Test_1)
+plot(housing$sale_def, housing$log_lake)
+```
+
+
+# Prediction
+
+Based on the following inputs, predict the deflated sales price:
+
+- 2 bed
+- 2 bath
+- area_heated = 1223
+- area = 9750
+- dist_cbd = 19368
+- dist_lakes = 490
+- no pool
+
+```{r}
+
+```
