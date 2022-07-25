@@ -77,8 +77,7 @@ plot(Reg)
 durbinWatsonTest(Reg)
 gvmodel <- gvlma(Test_1)
 summary(gvmodel)
-vif(Reg)
-outlierTest(Reg)
+
 ```
 
 Which of the variables tested significant at the 95% level? Looking at the results and answering outside of the chunk is sufficient.
