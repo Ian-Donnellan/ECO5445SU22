@@ -3,14 +3,18 @@ title: "Assignment05"
 output: html_document
 date: '2022-07-14'
 ---
-Question #2
+*JE: Would have liked to have had same YAML header with table of contents*
+
+# Question #2
+
+*JE: Adding `#` so that the sections are listed properly*
 
 ```{r}
-Two <- 2
-Two_oh <- 2.0
-Three <- "10j"
+Two <- 2 
+Two_oh <- 2.0 
+Three <- "10j" # Did you try without the quotes?
 Four <- "2 Cool for School"
-Five <- TRUE
+Five <- TRUE # Did you try True?
 
 str(Two)
 str(Two_oh)
@@ -20,6 +24,8 @@ str(Five)
 
 ```
 
+*JE: Did not provide examples, did not run any tests, errors out if character is provided in function. (-6)*
+
 ```{r}
 Foobar_Function <- function(x) {
   if (x %% 15 == 0) return(print("foobar"))
@@ -28,15 +34,23 @@ Foobar_Function <- function(x) {
   else if (x > 0) return(print("not a multiple of 3, 5, or 15"))
 }
 
-Foobar_Function()
+# Foobar_Function()
+
+# Foobar_Function("cat") commented out to allow document run
+Foobar_Function(90)
+Foobar_Function(20)
+Foobar_Function(9)
+
 ```
 
-Question 3 and 4
+# Question 3 and 4
 ```{r}
 attach(swiss)
 
 summary(swiss)
 ```
+
+*JE: Didn't provide spread of data (sd or variance) (-5)*
 
 Question 5
 ```{r}
@@ -53,7 +67,8 @@ cor(swiss)
 
 ```
 
-Question 7
+# Question 7
+
 ```{r}
 
 plot(Education, Fertility, main = "Correlation Between Fertility and Education")
@@ -61,7 +76,8 @@ text(Education, Fertility, row.names(swiss), pos = 3, cex = .6, col = "blue")
 
 ```
 
-Question 8
+# Question 8
+
 ```{r}
 hist(Catholic, breaks = 20, labels = TRUE, ylim = range(0,12))
 
