@@ -27,7 +27,8 @@ Bring in the data and make sure the data types are correct. If not, make the pro
 
 ```{r}
 housing <- read.csv("C:/Users/Ian Ah/Documents/GitHub/ECO5445/Assignment06/data/prop_prices_reduced.csv")
-housing$pool <- factor(housing$pool) 
+housing$prices_reduced <- housing$sale_def/1000
+
 ```
 
 
@@ -36,7 +37,7 @@ housing$pool <- factor(housing$pool)
 Plot histograms for all variables. Additionally, add scatterplots for the relationships between all quantitative variables.
 
 ```{r}
-hist(housing$sale_def)
+hist(housing$prices_reduced)
 hist(housing$bed)
 hist(housing$bath)
 hist(housing$area_heated)
@@ -45,15 +46,15 @@ hist(housing$dist_cbd)
 hist(housing$dist_lakes)
 hist(housing$pool)
 
-plot(housing$sale_def, housing$area_heated)
-plot(housing$sale_def, housing$bed)
-plot(housing$sale_def, housing$bath)
-plot(housing$sale_def, housing$area)
-plot(housing$sale_def, housing$dist_cbd)
-plot(housing$sale_def, housing$dist_lakes)
-plot(housing$sale_def, housing$pool)
+plot(housing$prices_reduced, housing$area_heated)
+plot(housing$prices_reduced, housing$bed)
+plot(housing$prices_reduced, housing$bath)
+plot(housing$prices_reduced, housing$area)
+plot(housing$prices_reduced, housing$dist_cbd)
+plot(housing$prices_reduced, housing$dist_lakes)
+plot(housing$prices_reduced, housing$pool)
 
-scatterplotMatrix(housing, spread = FALSE, lty.smooth = 2,
+scatterplotMatrix(housing,
     main = "Scatterplot Matrix")
 ```
 
@@ -71,25 +72,27 @@ cor(housing)
 Run a regression with all the variables included. Print results of the regression.
 
 ```{r}
-Reg <- lm(sale_def ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
-summary(Reg)
-plot(Reg)
-durbinWatsonTest(Reg)
-gvmodel <- gvlma(Test_1)
-summary(gvmodel)
+Reg <- lm(prices_reduced ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
 
+summary(Reg)
+
+plot(Reg)
 ```
 
 Which of the variables tested significant at the 95% level? Looking at the results and answering outside of the chunk is sufficient.
 
-Values that tested significant at the 95% level were sale_def, bed, bath, area_heated, area, dist_cbd, and pool. 
+Answer: Values that tested significant at the 95% level were sale_def, bed, bath, area_heated, area, dist_cbd, and pool. 
 
 ## Evaluating the model
 
 As is, are any of the Gauss-Markov assumptions violated? If so, which ones? How can you fix the issues?
 
 ```{r}
-#Assumption one is violated as many of the relationships between the variables are non-linear. For example, the relationship between sale_def and pools does not represent a linear relationship as the points plotted are 2 separate lines. 
+# One of the Gauss-Markov assumptions that is violated is the heteroscedastic nature of the data. This can be observed in the plots of relationships between data. It is very clear in the plotting of the housing prices to the area of the lot and the heated area of the home where you can see the fanning out of the points with the increase in x. It also can be observed by running the gvlma test where it does not satisfy the heteroscedasticity test. One way to fix this would be transforming the dependent variable. This can be done with a log transformation to reduce the variability in the data. The homogeneous nature of the data is slightly effected due to the large outliers of observations 37 and 7 which are far outside cooks distance. This can be solved by removing the outliers but that is not recommended. 
+
+gvmodel <- gvlma(Reg)
+summary(gvmodel)
+
 ```
 
 ## New Model
@@ -97,16 +100,11 @@ As is, are any of the Gauss-Markov assumptions violated? If so, which ones? How 
 Based off of your findings in the previous section, make changes to the variables, the functional form, etc.
 
 ```{r}
-housing$log_price <- (housing$sale_def/housing$area)
-housing$log_lake <- (housing$dist_lakes^2)
-housing$log_bath <- log(housing$bath)
 
-Reg <- lm(log_price ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
-summary(Reg)
-Test_1 <- lm(sale_def ~ area_heated + bath + area + bed + dist_cbd + dist_lakes, data = housing)
-summary(Test_1)
-plot(Test_1)
-plot(housing$sale_def, housing$log_lake)
+Reg2 <- lm(log(prices_reduced) ~ bed + bath + area_heated + area + dist_cbd + log(dist_lakes) + pool, data = housing)
+summary(Reg2)
+plot(Reg2)
+
 ```
 
 
@@ -123,5 +121,10 @@ Based on the following inputs, predict the deflated sales price:
 - no pool
 
 ```{r}
+housingreg <- data.frame("bed" = 2, "bath" = 2, "area_heated" = 1223, "area" = 9750, "dist_cbd" = 19368, 
+                         "dist_lakes" = 490, "pool" = 0)
+predict(Reg2, housingreg)
+exp(4.7378)*1000
 
+#The price of the home would be $114,183
 ```
