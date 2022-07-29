@@ -4,6 +4,14 @@ Created on Wed Jul 13 10:50:46 2022
 
 @author: Ian Ah
 """
+###############################################################################
+# Copy header formatting from my scripts
+###############################################################################
+
+###############################################################################
+# Script fails to run fully
+###############################################################################
+
 
 import os
 import numpy as np
@@ -14,6 +22,7 @@ from tabulate import tabulate
 os.getcwd()
 
 git_path = "C:\\Users\\Ian Ah\\Documents\\GitHub\\ECO5445"
+git_path = 'C:/Users/jo585802/OneDrive - University of Central Florida/Documents/GitHub/ECO5445/' # Needed line to test data
 os.chdir(git_path + '\\Project\\Data')
 
 os.getcwd()
@@ -50,17 +59,34 @@ housing_data = pd.read_csv("hmda_sw.csv", names = col_names, header = 0, delimit
 # The variables that I will be using in my calculations
 variables = housing_data[["Debt_to_Income_Total", "Race", "Self_Employed","Marital_Status","Years_of_Education","Loan_Amount","Action_Taken","Sex","Total_Monthly_Income","Purchase_Price","Credit_History_Mortgage"]]
 
+###############################################################################
+# Why did you choose these variables in particular? What information from the
+# paper helped you decide?
+###############################################################################
+
 ##################################################
 # Question Number 4
 ##################################################
 
+###############################################################################
+# The categorical variables are currently being treated as numeric. You cannot
+# do mean, sd, etc.
+###############################################################################
+
 summary = variables.describe()
 
-Pur_Price = variables["Purchase_Price"].tolist()
-for average_p in Pur_Price:
-    Pur_Price.remove(999999.4)
+###############################################################################
+# Commented out this section since it is cause script to fail. For loop looks
+# as though it is referencing an average, then trying to remove a value from
+# a single value and not a list. 
+###############################################################################
+
+# Pur_Price = variables["Purchase_Price"].tolist()
+# for average_p in Pur_Price:
+#     Pur_Price.remove(999999.4)
     
-average_price = np.mean(Pur_Price)
+# average_price = np.mean(Pur_Price)
+
 
 plt.hist(variables["Race"], label = "Race")
 plt.hist(variables["Sex"])
@@ -68,8 +94,15 @@ plt.hist(variables["Self_Employed"])
 # Using the summary statistics and visualizations generated we can see that the
 # average applicant seems to be white males that are not self employed.
 
+###############################################################################
+# What about frequency counts of other catergorical variables?
+###############################################################################
+
+
 plt.hist(variables["Total_Monthly_Income"])
-plt.hist(Pur_Price)
+
+#plt.hist(Pur_Price)
+
 # Using the summary statistics and visualizations generated we can see that the
 # average applicant seems to be white males that are not self employed. They on
 # average make ~$4,910 a month and are seeking loans for approximately $139,000.
@@ -88,6 +121,16 @@ plt.hist(variables["Action_Taken"])
 # questions which are entered as 999999.4. Interpreting the data besides those
 # entries the years seems to be approximately 15 years.
 
+###############################################################################
+# These plots do not provide details about what we are plotting
+# They need context in order to understand.
+###############################################################################
+
+###############################################################################
+# What about the linear relationships between different variables?
+# You are missing scatterplots and correlation matrices
+###############################################################################
+
 
 ##################################################
 # Question Number 5
@@ -97,6 +140,10 @@ Approved_or_Denied = variables["Action_Taken"].tolist()
 Approved = Approved_or_Denied.count(1)
 Denied = Approved_or_Denied.count(3)
 
+###############################################################################
+# Was there a reason not to include application approved, but not accepted?
+###############################################################################
+
 Prob_of_Approval = Approved / len(Approved_or_Denied)        
 print(Prob_of_Approval)
 
@@ -104,9 +151,16 @@ print(Prob_of_Approval)
 # Question Number 6
 ##################################################
 
+
 Race = variables["Race"].tolist()
 B = [Race,Approved_or_Denied]
 a = np.array(B)
+
+###############################################################################
+# There are some discrepancies in your table. 233+96 does not equal 339
+# You appear to have counted all the people, but not category 2. 
+###############################################################################
+
 
 Black_Approved = a[1] + a[0] == 4
 Black_Approved2 = a[1] + a[0] == 5
@@ -124,6 +178,10 @@ Count_White_Denied = np.count_nonzero(White_Denied == True)
 
 Table = [["","Approved", "Denied", "Total"],["Black", Count_Black_App, Count_Black_Denied, (Count_Black_App + Count_Black_App2 + Count_Black_Denied)],["White", Count_White_App, Count_White_Denied, (Count_White_Denied+Count_White_App+Count_White_App2)]]
 print(tabulate(Table, headers="firstrow", tablefmt="fancy_grid"))
+
+###############################################################################
+# Table does not fully match. Missing bottom row (Total) of table
+###############################################################################
 
 ##################################################
 # Question Number 7
