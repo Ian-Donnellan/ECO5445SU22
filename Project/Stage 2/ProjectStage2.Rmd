@@ -1,0 +1,42 @@
+---
+title: "ProjectStage2"
+author: "Ian Donnellan"
+date: '2022-08-01'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+mortgage.data <- read.csv("C:/Users/Ian Ah/Documents/GitHub/ECO5445/Project/Data/hmda_sw.csv")
+
+col_names = c("Sequence","Loan_Type","Loan_Purpose","Occupancy","Loan_Amount", 
+             "Action_Taken","Location","County","Race", "Co_App_Race","Sex",
+             "Co_App_Sex","App_Income","Loan_Purchaser","Reasons_For_Denial",
+             "Reasons_Corr_1","Reasons_Corr_2","Reasons_Corr_3","Number_Units",
+             "Marital_Status","Number_Dependents","Years_Employed",
+             "Years_Employed_Job","Self_Employed","Base_Monthly_Income",
+             "Base_Monthly_Income_Co_App","Total_Monthly_Income",
+             "Total_Monthly_Income_Co_App","Prop_Monthly_Expense",
+             "Purchase_Price","Other_Financing","Liquid_Assets",
+             "Commercial_Credit_Report","Credit_History_Meets_Guidelines",
+             "Consumer_Credit_Lines","Credit_History_Mortgage",
+             "Credit_History_Consumer","Credit_History","Debt_to_Income_Housing",
+             "Debt_to_Income_Total","Fixed_or_Adjustable_Loan","Term_of_Loan",
+             "Special_Loan_Prog","Appraised_Value","Type_of_Property",
+             "PMI_Sought?","PMI_Denied?","Gift_Grant_Downpayment?","Cosigner?",
+             "Unverifiable_Info","Times_App_Reviewed","Net_Worth",
+             "Prob_Unemployment","Minority_Population","Boarded_Up_Value",
+             "Median_Income","Applicant_Age","Tract_Vacancy",
+             "Years_of_Education","Change_in_Median_Value","Owner_Occupied_Dummy"
+             ,"Type_of_Prop_Dummy")
+
+colnames(mortgage.data) <- col_names
+
+variables <- mortgage.data[c("Debt_to_Income_Total", "Race", "Self_Employed","Marital_Status","Years_of_Education","Loan_Amount","Action_Taken","Sex","Total_Monthly_Income","Purchase_Price","Credit_History_Mortgage")]
+
+
+```
+

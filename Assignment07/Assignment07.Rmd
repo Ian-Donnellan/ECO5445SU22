@@ -1,0 +1,124 @@
+---
+title: "Assignment07"
+author: "Ian Donnellan"
+date: '2022-07-30'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(gamlr)
+library(pROC)
+library(rpart)
+library(rpart.plot)
+library(party)
+library(randomForest)
+library(Metrics)
+
+```
+# Question 1
+
+```{r}
+housing <- read.csv("C:/Users/Ian Ah/Documents/GitHub/ECO5445SU22/Assignment07/data/prop_prices_reduced.csv")
+housing$prices_reduced <- housing$sale_def/1000
+housing$dist_lakes <- log(housing$dist_lakes)
+set.seed(1234)
+
+train <- sample(nrow(housing), 0.9*nrow(housing))
+housing.train <- housing[train,]
+housing.test <- housing[-train,]
+
+```
+
+## Question 2
+
+```{r}
+Reg2 <- lm(log(prices_reduced) ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing.train)
+summary(Reg2)
+```
+
+### Question 3
+
+```{r}
+y <- log(housing.train$prices_reduced)
+x <- housing.train[,2:8]
+ 
+
+y <- as.matrix(y)
+x <- as.matrix(x)
+
+lasso <- gamlr(x, y, verb = TRUE)
+
+plot(lasso, xlim = c(-6,0), ylim = c(-.05,.15))
+
+```
+
+## Question 4
+
+```{r}
+cv.lasso <- cv.gamlr(x ,y, family="gaussian", 
+                     verb=TRUE, standardize=TRUE, nfold=10)
+par(mfrow=c(1,2))
+plot(cv.lasso)
+plot(cv.lasso$gamlr)
+```
+
+# Question 5
+
+```{r}
+log(lasso$lambda[which.min(AICc(lasso))])
+log(lasso$lambda[which.min(AIC(lasso))])
+log(lasso$lambda[which.min(BIC(lasso))])
+log(cv.lasso$lambda.min)
+log(cv.lasso$lambda.1se)
+
+prediction <- predict(Reg2, housing.test)
+actual <- log(housing.test$prices_reduced)
+Reg2.rmse <- rmse(actual, prediction)
+
+lasso.aicc <- predict(lasso, housing.test[,2:8], select = which.min(AICc(lasso)))
+lasso.aicc <- as.matrix(lasso.aicc)
+lasso.aiccrmse <- rmse(actual, lasso.aicc)
+
+lasso.aic <- predict(lasso, housing.test[,2:8], select = which.min(AIC(lasso)))
+lasso.aic <- as.matrix(lasso.aic)
+lasso.aicrmse <- rmse(actual, lasso.aic)
+
+lasso.bic <- predict(lasso, housing.test[,2:8], select = which.min(BIC(lasso)))
+lasso.bic <- as.matrix(lasso.bic)
+lasso.bicrmse <- rmse(actual, lasso.bic)
+
+lasso.cv <- predict(cv.lasso, housing.test[,2:8], select = "min")
+lasso.cv <- as.matrix(lasso.cv)
+lasso.cvrmse <- rmse(actual, lasso.cv)
+
+lasso.1se <- predict(cv.lasso, housing.test[,2:8], select = "1se")
+lasso.1se <- as.matrix(lasso.1se)
+lasso.1sermse <- rmse(actual, lasso.1se)
+
+```
+
+```{r}
+#Printing the values
+Reg2.rmse
+lasso.aiccrmse
+lasso.aicrmse
+lasso.bicrmse
+lasso.cvrmse
+lasso.1sermse
+
+```
+
+Running the testing data through the model we can see that the AICC, AIC, BIC, and CV produce the smallest values of RMSE all at 0.27246. This is followed by the original model which produced an RMSE of 0.27332. Lastly, the worst method comes in with the 1se at 0.27558.
+
+
+
+
+
+
+
+
+
