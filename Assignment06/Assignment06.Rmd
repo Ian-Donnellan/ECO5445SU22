@@ -9,8 +9,10 @@ output:
     number_sections: true
 ---
 
+`Didn't update name`
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 ```{r packages}
@@ -26,9 +28,14 @@ We are going to look at the property prices for Orange County. From there we are
 Bring in the data and make sure the data types are correct. If not, make the proper changes. The file is located within this project. *data/prop_prices_reduced.csv*
 
 ```{r}
+<<<<<<< Updated upstream
 housing <- read.csv("C:/Users/Ian Ah/Documents/GitHub/ECO5445/Assignment06/data/prop_prices_reduced.csv")
 housing$prices_reduced <- housing$sale_def/1000
 
+=======
+housing <- read.csv("data/prop_prices_reduced.csv")
+housing$pool <- factor(housing$pool) 
+>>>>>>> Stashed changes
 ```
 
 
@@ -37,6 +44,7 @@ housing$prices_reduced <- housing$sale_def/1000
 Plot histograms for all variables. Additionally, add scatterplots for the relationships between all quantitative variables.
 
 ```{r}
+<<<<<<< Updated upstream
 hist(housing$prices_reduced)
 hist(housing$bed)
 hist(housing$bath)
@@ -55,6 +63,29 @@ plot(housing$prices_reduced, housing$dist_lakes)
 plot(housing$prices_reduced, housing$pool)
 
 scatterplotMatrix(housing,
+=======
+# hist(housing$sale_def)
+# hist(housing$bed)
+# hist(housing$bath)
+# hist(housing$area_heated)
+# hist(housing$area)
+# hist(housing$dist_cbd)
+# hist(housing$dist_lakes)
+# hist(housing$pool)  
+# cannot run histogram for categorical data code failed at this point
+
+# plot(housing$sale_def, housing$area_heated)
+# plot(housing$sale_def, housing$bed)
+# plot(housing$sale_def, housing$bath)
+# plot(housing$sale_def, housing$area)
+# plot(housing$sale_def, housing$dist_cbd)
+# plot(housing$sale_def, housing$dist_lakes)
+# plot(housing$sale_def, housing$pool)
+
+
+# This is sufficient
+scatterplotMatrix(housing, spread = FALSE, lty.smooth = 2,
+>>>>>>> Stashed changes
     main = "Scatterplot Matrix")
 ```
 
@@ -64,7 +95,13 @@ Provide basic summary statistics for univariate analysis. Also, provide the corr
 
 ```{r}
 summary(housing)
-cor(housing)
+
+# What about spread? sd/variance (-5)
+
+# cor(housing)
+# code fails because you cannot run a correlation on a factor. Pool needs
+# to be removed for this to run. (-2)
+
 ```
 
 # Regression Analysis
@@ -75,18 +112,38 @@ Run a regression with all the variables included. Print results of the regressio
 Reg <- lm(prices_reduced ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
 
 summary(Reg)
+<<<<<<< Updated upstream
+=======
+plot(Reg)
+durbinWatsonTest(Reg)
+
+#gvmodel <- gvlma(Test_1)
+#summary(gvmodel)
+# Code failed to run at this level because Test_1 doesn't exist until later 
+# chunk (-2)
+
+gvlma(Reg)
+>>>>>>> Stashed changes
 
 plot(Reg)
 ```
 
 Which of the variables tested significant at the 95% level? Looking at the results and answering outside of the chunk is sufficient.
 
+<<<<<<< Updated upstream
 Answer: Values that tested significant at the 95% level were sale_def, bed, bath, area_heated, area, dist_cbd, and pool. 
+=======
+Values that tested significant at the 95% level were `sale_def`, bed, bath, area_heated, area, dist_cbd, and `pool`. 
+
+`only independent variables can test significant (-2)`
+`pool was not significant at 95% level (-2)`
+>>>>>>> Stashed changes
 
 ## Evaluating the model
 
 As is, are any of the Gauss-Markov assumptions violated? If so, which ones? How can you fix the issues?
 
+<<<<<<< Updated upstream
 ```{r}
 # One of the Gauss-Markov assumptions that is violated is the heteroscedastic nature of the data. This can be observed in the plots of relationships between data. It is very clear in the plotting of the housing prices to the area of the lot and the heated area of the home where you can see the fanning out of the points with the increase in x. It also can be observed by running the gvlma test where it does not satisfy the heteroscedasticity test. One way to fix this would be transforming the dependent variable. This can be done with a log transformation to reduce the variability in the data. The homogeneous nature of the data is slightly effected due to the large outliers of observations 37 and 7 which are far outside cooks distance. This can be solved by removing the outliers but that is not recommended. 
 
@@ -94,6 +151,12 @@ gvmodel <- gvlma(Reg)
 summary(gvmodel)
 
 ```
+=======
+`Assumption one` is violated as many of the relationships between the variables are non-linear. For example, the relationship between sale_def and pools does not represent a linear relationship as the points plotted are 2 separate lines.
+
+`The one you describes related to assumption 3, not assumption 1 (-2)`
+`What about the rest of the assumptions? (-20)`
+>>>>>>> Stashed changes
 
 ## New Model
 
@@ -101,10 +164,25 @@ Based off of your findings in the previous section, make changes to the variable
 
 ```{r}
 
+<<<<<<< Updated upstream
 Reg2 <- lm(log(prices_reduced) ~ bed + bath + area_heated + area + dist_cbd + log(dist_lakes) + pool, data = housing)
 summary(Reg2)
 plot(Reg2)
 
+=======
+Reg <- lm(log_price ~ bed + bath + area_heated + area + dist_cbd + dist_lakes + pool, data = housing)
+summary(Reg)
+Test_1 <- lm(sale_def ~ area_heated + bath + area + bed + dist_cbd + dist_lakes, data = housing)
+summary(Test_1)
+plot(Test_1)
+plot(housing$sale_def, housing$log_lake)
+
+# Which model did you choose?
+# After your changes were the Gauss-Markov assumptions valid? (-5)
+# Assuming that the code in earlier chunk was meant for this:
+gvmodel <- gvlma(Test_1)
+summary(gvmodel)
+>>>>>>> Stashed changes
 ```
 
 
@@ -121,10 +199,14 @@ Based on the following inputs, predict the deflated sales price:
 - no pool
 
 ```{r}
+<<<<<<< Updated upstream
 housingreg <- data.frame("bed" = 2, "bath" = 2, "area_heated" = 1223, "area" = 9750, "dist_cbd" = 19368, 
                          "dist_lakes" = 490, "pool" = 0)
 predict(Reg2, housingreg)
 exp(4.7378)*1000
 
 #The price of the home would be $114,183
+=======
+# incomplete (-5)
+>>>>>>> Stashed changes
 ```
