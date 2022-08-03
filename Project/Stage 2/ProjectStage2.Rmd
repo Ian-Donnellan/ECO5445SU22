@@ -10,6 +10,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(pROC)
+library(plyr)
+```
+
+#A
+
+The variables in the dataset do not have intuitive names (e.g., the meaning of S3 is unclear). Referencing the data description and the AER paper, identify the qualitative dependent that you will be modeling and the set of covariates that you intend to include in your various models, and rename the variables so that they have (somewhat) intuitive names. Be certain that the debt-to-income ratio and the race, self-employed, marital status, and education indicator variables are included, among other variables.
+
+```{r}
 mortgage.data <- read.csv("C:/Users/Ian Ah/Documents/GitHub/ECO5445/Project/Data/hmda_sw.csv")
 
 col_names = c("Sequence","Loan_Type","Loan_Purpose","Occupancy","Loan_Amount", 
@@ -35,8 +44,61 @@ col_names = c("Sequence","Loan_Type","Loan_Purpose","Occupancy","Loan_Amount",
 
 colnames(mortgage.data) <- col_names
 
-variables <- mortgage.data[c("Debt_to_Income_Total", "Race", "Self_Employed","Marital_Status","Years_of_Education","Loan_Amount","Action_Taken","Sex","Total_Monthly_Income","Purchase_Price","Credit_History_Mortgage")]
+variables <- mortgage.data[c("Debt_to_Income_Total", "Race", "Self_Employed","Marital_Status","Years_of_Education","Loan_Amount","Appraised_Value","Action_Taken","Sex","Total_Monthly_Income","Purchase_Price","Credit_History_Mortgage","Years_Employed_Job")]
 
-
+variables$Race <- factor(variables$Race, levels= c(3,5), labels = c("Black","White"))
+variables$Action_Taken <- factor(variables$Action_Taken, levels = c(1,2,3), labels = c("Approved", "Approved", "Denied"))
+variables$Marital_Status <- factor(variables$Marital_Status)
+variables$Credit_History_Mortgage <- factor(variables$Credit_History_Mortgage)
+variables$Sex <- factor(variables$Sex, levels= c(1,2), labels = c("Male","Female"))
+variables[variables == 999999.4] <- NA
 ```
 
+Appraised value and Loan amount can be compared to find the equity in the property and lender's margin of safety. Higher the applicant's equity share the lower the chance of default. Including the mortgage credit history
+
+##B
+
+Generate summary statistics on the set of variables selected in A, and explain the composition of the sample and of the characteristics of an average (representative) applicant. In the process, you should also generate and histograms and frequency counts on particular variables of interest, which can be referenced in your explanation of the composition of the sample and of a representative applicant.
+
+```{r}
+summary(variables)
+
+
+sd(variables$Loan_Amount, na.rm = TRUE)
+sd(variables$Appraised_Value, na.rm = TRUE)
+sd(variables$Total_Monthly_Income, na.rm = TRUE)
+sd(variables$Years_of_Education, na.rm = TRUE)
+sd(variables$Purchase_Price, na.rm = TRUE)
+sd(variables$Years_Employed_Job, na.rm = TRUE)
+sd(variables$Debt_to_Income_Total, na.rm = TRUE)
+```
+
+```{r}
+hist(variables$Years_of_Education)
+hist(variables$Appraised_Value, breaks = "fd")
+hist(variables$Debt_to_Income_Total, breaks = "fd")
+count(variables, "Action_Taken")
+count(variables, "Race")
+count(variables, "Sex")
+count(variables, "Marital_Status")
+```
+
+###C
+
+With the full sample, estimate the logistic regression model, where the deny/approve dummy variable is the response variable and the debt-to-income ratio and the race, self-employed, marital status, and education indicator variables are the co-variates. Graph the ROC curve and calculate the AUC. Also, compute the confusion matrix at alternative cut-off levels, and calculate the classifier sensitivity, specificity, the false-positive rate, the false-negative rate, the model accuracy and error rate to confirm they are the same as those produced by R. Provide a written explanation summarizing the findings.
+
+```{r}
+Reg <- glm(Action_Taken ~ Debt_to_Income_Total + Race + Self_Employed + Marital_Status + Years_of_Education + Loan_Amount + Appraised_Value + Sex + Total_Monthly_Income + Purchase_Price + Credit_History_Mortgage + Years_Employed_Job, data = variables ,family = binomial)
+
+summary(Reg)
+
+roc(variables$Action_Taken, )
+```
+
+##D
+
+Next, using 10-fold cross validation, estimate a variety of logistic regression models and evaluate their predictive performance across a range of threshold values in each case. The models can (should) include interaction variables and polynomial terms (e.g., quadratic and cubic variables). Of interest is identifying the model and threshold value that yield the smallest average test misclassification rate; however, you can also calculate model accuracy and the AUC. Document in a table the performance of the various models using the chosen performance measures.
+
+#E
+
+Of the competing models that you estimated and thresholds that you evaluated, identify the superior model for classification purposes. Re-estimate the model with the full sample of data. Then, graph the ROC, calculate the AUC, and compute the confusion matrix at the threshold level associated with the minimum average test mis-classification rate . Calculate the classifier sensitivity and specificity, the false-positive rate, the false negative rate, the accuracy, and overall mis-classification rate. How well does your superior model perform relative to the model estimated in C? Explain. Note that to do so you will need to calculate the confusion matrix from the estimated model in C at the threshold level.
