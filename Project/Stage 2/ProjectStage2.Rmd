@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(pROC)
 library(plyr)
+library(gamlr)
 ```
 
 #A
@@ -51,6 +52,7 @@ variables$Action_Taken <- factor(variables$Action_Taken, levels = c(1,2,3), labe
 variables$Marital_Status <- factor(variables$Marital_Status)
 variables$Credit_History_Mortgage <- factor(variables$Credit_History_Mortgage)
 variables$Sex <- factor(variables$Sex, levels= c(1,2), labels = c("Male","Female"))
+variables$Self_Employed <- factor(variables$Self_Employed, levels= c(0,1), labels = c("Not Self-Employed","Self-Employed"))
 variables[variables == 999999.4] <- NA
 ```
 
@@ -74,7 +76,7 @@ sd(variables$Debt_to_Income_Total, na.rm = TRUE)
 ```
 
 ```{r}
-hist(variables$Years_of_Education)
+hist(variables$Years_of_Education, breaks = "fd")
 hist(variables$Appraised_Value, breaks = "fd")
 hist(variables$Debt_to_Income_Total, breaks = "fd")
 count(variables, "Action_Taken")
@@ -88,17 +90,87 @@ count(variables, "Marital_Status")
 With the full sample, estimate the logistic regression model, where the deny/approve dummy variable is the response variable and the debt-to-income ratio and the race, self-employed, marital status, and education indicator variables are the co-variates. Graph the ROC curve and calculate the AUC. Also, compute the confusion matrix at alternative cut-off levels, and calculate the classifier sensitivity, specificity, the false-positive rate, the false-negative rate, the model accuracy and error rate to confirm they are the same as those produced by R. Provide a written explanation summarizing the findings.
 
 ```{r}
-Reg <- glm(Action_Taken ~ Debt_to_Income_Total + Race + Self_Employed + Marital_Status + Years_of_Education + Loan_Amount + Appraised_Value + Sex + Total_Monthly_Income + Purchase_Price + Credit_History_Mortgage + Years_Employed_Job, data = variables ,family = binomial)
+#Reg <- glm(Action_Taken ~ Debt_to_Income_Total + Race + Self_Employed + Marital_Status + Years_of_Education + Loan_Amount + Appraised_Value + Sex + Total_Monthly_Income + Purchase_Price + Credit_History_Mortgage + Years_Employed_Job, data = variables ,family = "binomial")
+
+Reg <- glm(Action_Taken ~ Debt_to_Income_Total + Race + Self_Employed + Marital_Status + Years_of_Education , data = variables ,family = "binomial")
 
 summary(Reg)
 
-roc(variables$Action_Taken, )
+```
+
+```{r}
+prob <- predict(Reg, variables, type = "response")
+my_roc <- roc(variables$Action_Taken ~ prob, plot = TRUE)
+my_auc <- auc(my_roc)
+
+logit.pred <- factor(prob > 0.5, levels = c(FALSE,TRUE),
+                     labels = c("Approved","Denied"))
+logit.perf <- table(variables$Action_Taken, logit.pred, dnn = c("Actual","Predicted"))
+logit.perf
+
+logit.pred2 <- factor(prob > 0.75, levels = c(FALSE,TRUE),
+                     labels = c("Approved","Denied"))
+logit.perf2 <- table(variables$Action_Taken, logit.pred2, dnn = c("Actual","Predicted"))
+logit.perf2
+
+logit.pred3 <- factor(prob > 0.25, levels = c(FALSE,TRUE),
+                     labels = c("Approved","Denied"))
+logit.perf3 <- table(variables$Action_Taken, logit.pred3, dnn = c("Actual","Predicted"))
+logit.perf3
+
+threshold <- my_roc$thresholds[which.max(my_roc$sensitivities + my_roc$specificities)]
+
+logit.pred.thresh <- factor(prob > threshold, levels = c(FALSE,TRUE),
+                     labels = c("Approved","Denied"))
+logit.perf.thresh <- table(variables$Action_Taken, logit.pred.thresh, dnn = c("Actual","Predicted"))
+logit.perf.thresh
+
+```
+
+
+```{r}
+performance <- function(table, n = 4){
+  if(!all(dim(table) == c(2,2)))
+    stop("Must be a 2 x 2 table")
+  tn = table[1,1]
+  fp = table[1,2]
+  fn = table[2,1]
+  tp = table[2,2]
+  sensitivity = tp/(tp+fn)
+  specificity = tn/(tn+fp)
+  ppp = tp/(tp+fp)
+  npp = tn/(tn+fp)
+  hitrate = (tp+tn)/(tp+tn+fp+fn)
+  result <- paste0("Sensitivity = ", round(sensitivity,n),
+                   "\nSpecificity = ",round(specificity,n),
+                   "\nPositive Predictive Value = ", round(ppp,n),
+                   "\nNegative Predictive Value = ", round(npp,n),
+                   "\nAccuracy = ", round(hitrate,n))
+  cat(result)
+}
+  
+performance(logit.perf)
+performance(logit.perf2)
+performance(logit.perf3)
+performance(logit.perf.thresh)
 ```
 
 ##D
 
 Next, using 10-fold cross validation, estimate a variety of logistic regression models and evaluate their predictive performance across a range of threshold values in each case. The models can (should) include interaction variables and polynomial terms (e.g., quadratic and cubic variables). Of interest is identifying the model and threshold value that yield the smallest average test misclassification rate; however, you can also calculate model accuracy and the AUC. Document in a table the performance of the various models using the chosen performance measures.
+```{r}
+y <- variables$Action_Taken
+x <- variables[-c(8)]
+
+cv.housingreg <- cv.gamlr(x, y, 
+	free=1,family="binomial", verb=TRUE, standardize=TRUE, nfold = 10)
+```
+
 
 #E
 
 Of the competing models that you estimated and thresholds that you evaluated, identify the superior model for classification purposes. Re-estimate the model with the full sample of data. Then, graph the ROC, calculate the AUC, and compute the confusion matrix at the threshold level associated with the minimum average test mis-classification rate . Calculate the classifier sensitivity and specificity, the false-positive rate, the false negative rate, the accuracy, and overall mis-classification rate. How well does your superior model perform relative to the model estimated in C? Explain. Note that to do so you will need to calculate the confusion matrix from the estimated model in C at the threshold level.
+```{r}
+
+```
+
